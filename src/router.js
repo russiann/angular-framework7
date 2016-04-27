@@ -61,7 +61,11 @@ class F7Router {
           return route.config.name === pageName
         })
         // TODO: pass router params and querystring.
-        this.HashRouter.navigate(route.path);
+        if (route) {
+          this.HashRouter.navigate(route.path);
+        } else {
+          throw new Error('Route doesn\'t exist!')
+        }
       },
       findRouteByUrl: (url) => {
         return new Promise((resolve, reject) => {
