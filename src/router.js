@@ -55,8 +55,14 @@ class F7Router {
 
   $get($rootScope, $compile) {
     return {
-      state: this.state,
       back: this.back,
+      state: (pageName) => {
+        const route = this.routes.find((route) => {
+          return route.config.name === pageName
+        })
+        // TODO: pass router params and querystring.
+        this.HashRouter.navigate(route.path);
+      },
       findRouteByUrl: (url) => {
         return new Promise((resolve, reject) => {
 
