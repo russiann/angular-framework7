@@ -1,8 +1,14 @@
 function HashRouter () {
 
+  function init() {
+    Router.init();
+  }
+
   var Router = {
     $get: function () {
-
+      return {
+        init: init
+      }
     },
     init: function (onRouteChange, onRouteNotFound) {
 
