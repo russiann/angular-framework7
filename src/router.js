@@ -3,7 +3,6 @@ class F7Router {
     this.$F7Provider = $F7Provider;
     this.HashRouter = HashRouterProvider;
     this.routes = [];
-
   }
 
   when(path, config) {
@@ -31,10 +30,6 @@ class F7Router {
     this.HashRouter.add(route);
     this.routes.push(route);
     return this;
-  }
-
-  init() {
-    this.HashRouter.init();
   }
 
   loadPage(url, pageName, controller, controllerAs, hooks) {
