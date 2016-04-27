@@ -1,0 +1,23 @@
+{
+  "name": "example",
+  "authors": [
+    "Russian <russian.reboucas@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "Framework7": "framework7#~1.4.2",
+    "angular": "~1.5.5",
+    "material-design-icons": "~2.2.3"
+  }
+}
