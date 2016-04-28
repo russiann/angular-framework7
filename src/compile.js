@@ -41,4 +41,4 @@ class Compile {
 }
 
 angular.module('framework7')
-  .factory('$F7Compile', Compile)
+  .service('$F7Compile', Compile)
