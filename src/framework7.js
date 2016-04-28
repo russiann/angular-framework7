@@ -3,9 +3,18 @@ class Framework7 {
     this.instance = null;
     this.views    = [];
     this.mainView = null;
+    this.theme = "material";
   }
 
   init(params, debug) {
+    this.theme = params.theme || this.theme;
+    this.theme = window.Framework7.prototype.device.android ? "material" : "ios";
+    if (this.theme === 'material') {
+      params.material = true;
+    } else {
+      params.material = false;
+    }
+
     this.instance = new window.Framework7(params);
     if (debug) window.f7 = this.instance;
   }
@@ -14,6 +23,9 @@ class Framework7 {
     if (this.f7) throw Error('Framework7 not initialized.');
     if (this.views[name]) {
       throw Error(`View with name ${name} already defined!`);
+    }
+    if (this.theme === 'ios') {
+      parameters.dynamicNavbar = (parameters.dynamicNavbar === true) ? true : false;
     }
     const view = this.instance.addView(selector, parameters);
     this.views[name] = view;

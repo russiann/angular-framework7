@@ -1,13 +1,19 @@
 function HashRouter () {
 
-  function init() {
-    Router.init();
-  }
-
   var Router = {
-    $get: function () {
+    $get: function ($rootScope, $F7Router) {
       return {
-        init: init
+        init: () => {
+          this.init();
+          $rootScope.$on('f7:pageAfterAnimation', (e, data) => {
+            if (data.detail.pageData.swipeBack) {
+              $F7Router.findRouteByUrl(data.detail.pageData.url)
+              .then((route) => {
+                Router.navigate(route.path);
+              })
+            }
+          })
+        }
       }
     },
     init: function (onRouteChange, onRouteNotFound) {

@@ -13,11 +13,16 @@ class Compile {
       this.$F7Router.findRouteByUrl(pageData.url)
         .then((route) => {
           const config = route.config;
+          const navbar = data.detail.pageData.navbarInnerContainer;
           const $scope = this.$rootScope.$new();
           this.$controller(config.controller, {$scope}, null, config.controllerAs);
           this.$timeout(() => {
             var template = angular.element(pageData.container);
             this.$compile(template)($scope);
+            if (navbar) {
+              var navbarElement = angular.element(navbar);
+              this.$compile(navbarElement)($scope);
+            }
           });
         })
         .catch((err) => {

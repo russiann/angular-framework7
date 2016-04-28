@@ -33,24 +33,51 @@ class F7Router {
   }
 
   loadPage(url, pageName, controller, controllerAs, hooks) {
+    const theme = this.$F7Provider.theme;
     const view = this.$F7Provider.getMainView();
     if (~view.history.indexOf(url)) {
       view.router.back({ force: 'true', url: url });
     } else {
-      Dom7.get(url, function (data) {
+      Dom7.get(url, (data) => {
 
         var content = Dom7(data)
 
         var ngController = controller;
         if (controllerAs) ngController += ' as ' + controllerAs;
 
-        content.attr('data-page', pageName);
+        content.find('.page').attr('data-page', pageName);
+
+        content = this.setLayout(theme, content);
 
         // é necessário passar a url para que o histórico do f7 funcione normalmente
         // e não haja duplicidade de telas
-        view.router.load({content, url});
+        view.router.load({content, url, animatePages:true});
       });
     }
+  }
+
+  setLayout(theme, htmlContent) {
+
+    var root = htmlContent.parent();
+    var content = htmlContent.find('.page');
+
+    if (theme === 'ios') {
+      var navbar = htmlContent.find('.navbar');
+      var toolbar = htmlContent.find('.toolbar');
+
+
+      if (navbar.html()) {
+        content.addClass('navbar-through');
+        htmlContent.parent().prepend(navbar);
+      }
+
+      if (toolbar.html()) {
+        content.addClass('toolbar-through');
+        htmlContent.parent().append(toolbar);
+      }
+    }
+
+    return htmlContent.parent().html();
   }
 
   $get($rootScope, $compile) {
