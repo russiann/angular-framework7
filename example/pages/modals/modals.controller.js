@@ -3,25 +3,25 @@ angular.module('app.modals')
 
   this.alert = function() {
     $F7Modal.alert('Hello there!', 'Hey')
-    .then(() => {
+    .then(function() {
       console.log('Ok Clicked');
     })
   }
   this.confirm = function() {
     $F7Modal.confirm('Do you wanna Milk?', 'Question')
-    .then(() => {
+    .then(function() {
       console.log('No, I don\'t');
     })
-    .catch(() => {
+    .catch(function() {
       console.log('Yes, sure!');
     })
   }
   this.prompt = function() {
     $F7Modal.prompt('What is your email?', 'Question', $scope)
-    .then((res) => {
+    .then(function (res) {
       $F7Modal.alert(`My email is ${res}.`, 'Answer')
     })
-    .catch(() => {
+    .catch(function() {
       console.log('Canceled!');
     })
   }

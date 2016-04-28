@@ -3,7 +3,8 @@ angular.module('app', ['framework7', 'pages'])
   .config(function($F7Provider, $F7RouterProvider){
 
     $F7Provider.init({
-      swipePanel: 'left'
+      swipePanel: 'left',
+      materialRipple: false
     }, true);
 
     $F7Provider.addView('main', '.view-main', {

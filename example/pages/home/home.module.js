@@ -1,10 +1,13 @@
-const homeConfig = function ($F7RouterProvider) {
+var homeConfig = function ($F7RouterProvider) {
   $F7RouterProvider
   .when('#/', {
     name: 'Home',
     controller: 'HomeController',
     controllerAs: 'vm',
-    templateUrl: 'pages/home/home.view.html'
+    templateUrls: {
+      android: 'pages/home/home.view.android.html',
+      ios: 'pages/home/home.view.ios.html',
+    }
   });
 }
 
