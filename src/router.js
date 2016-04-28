@@ -11,8 +11,13 @@ class F7Router {
       path: path,
       config: config,
       before: function() {
+        const template = self.$F7Provider.theme === 'android' ?
+          this.config.templateUrls.android :
+          this.config.templateUrls.ios;
+
+        console.log('load: ', template);
         self.loadPage(
-          this.config.templateUrl,
+          template,
           this.config.name,
           this.config.controller,
           this.config.controllerAs,
@@ -60,23 +65,26 @@ class F7Router {
 
     var root = htmlContent.parent();
     var content = htmlContent.find('.page');
+    var navbar = htmlContent.find('.navbar');
+    var toolbar = htmlContent.find('.toolbar');
 
     if (theme === 'ios') {
-      var navbar = htmlContent.find('.navbar');
-      var toolbar = htmlContent.find('.toolbar');
-
-
       if (navbar.html()) {
         content.addClass('navbar-through');
         htmlContent.parent().prepend(navbar);
       }
-
       if (toolbar.html()) {
         content.addClass('toolbar-through');
         htmlContent.parent().append(toolbar);
       }
+    } else {
+      if (navbar.html()) {
+        content.addClass('navbar-fixed');
+      }
+      if (toolbar.html()) {
+        content.addClass('toolbar-fixed');
+      }
     }
-
     return htmlContent.parent().html();
   }
 
@@ -98,7 +106,11 @@ class F7Router {
         return new Promise((resolve, reject) => {
 
           const route = this.routes.find((route) => {
-            return route.config.templateUrl === url
+            if (this.$F7Provider.theme === 'android') {
+              return route.config.templateUrls.android === url
+            } else {
+              return route.config.templateUrls.ios === url
+            }
           })
 
           return route ? resolve(route) : reject();

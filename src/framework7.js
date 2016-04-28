@@ -3,16 +3,17 @@ class Framework7 {
     this.instance = null;
     this.views    = [];
     this.mainView = null;
-    this.theme = "material";
+    this.theme = null;
   }
 
   init(params, debug) {
-    this.theme = params.theme || this.theme;
-    this.theme = window.Framework7.prototype.device.android ? "material" : "ios";
-    if (this.theme === 'material') {
+    this.theme = window.Framework7.prototype.device.android ? "android" : "ios";
+    if (this.theme === 'android') {
       params.material = true;
+      Dom7('.pages').addClass('navbar-fixed');
     } else {
       params.material = false;
+      Dom7('.pages').addClass('navbar-through');
     }
 
     this.instance = new window.Framework7(params);
@@ -44,6 +45,7 @@ class Framework7 {
     return {
       instance: () => this.instance,
       mainView: () => this.getMainView,
+      theme: () => this.theme,
       view: (viewName) => {
         if (!viewName && !this.mainView) throw Error('MainView not defined.');
         if (!viewName && this.mainView) return this.mainView;
