@@ -1,4 +1,5 @@
-<div class="page product-component navbar-fixed">
+<div class="page product-component">
+
   <div class="navbar">
     <div class="navbar-inner">
       <div data-panel="left" class="left" go-back>
@@ -9,11 +10,15 @@
       <div class="center" go-back>Modals</div>
     </div>
   </div>
+  
   <div class="page-content">
-    <p>Custom Modal input text model: {{vm.text}}</p>
-    <p><a href="#" class="button" ng:click="vm.alert()">Open Alert</a></p>
-    <p><a href="#" class="button" ng:click="vm.confirm()">Open Confirm</a></p>
-    <p><a href="#" class="button" ng:click="vm.prompt()">Open Prompt</a></p>
-    <p><a href="#" class="button" ng:click="vm.custom()">Open Custom Modal</a></p>
+    <div class="content-block">
+      <p>Custom Modal input text model: {{vm.text}}</p>
+      <p><a href="#" class="button" ng:click="vm.alert()">Open Alert</a></p>
+      <p><a href="#" class="button" ng:click="vm.confirm()">Open Confirm</a></p>
+      <p><a href="#" class="button" ng:click="vm.prompt()">Open Prompt</a></p>
+      <p><a href="#" class="button" ng:click="vm.custom()">Open Custom Modal</a></p>
+
+    </div>
   </div>
 </div>
