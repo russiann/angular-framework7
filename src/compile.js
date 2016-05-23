@@ -8,6 +8,7 @@ class Compile {
   }
 
   init() {
+  
     this.$rootScope.$on('f7:pageBeforeInit', (e, data) => {
       const pageData = data.detail.pageData;
       this.$F7Router.findRouteByUrl(pageData.url)

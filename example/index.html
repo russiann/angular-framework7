@@ -7,16 +7,20 @@
     <!-- <link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.css"  charset="utf-8">
     <link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.colors.css"  charset="utf-8"> -->
     <link rel="stylesheet" href="bower_components/material-design-icons/iconfont/material-icons.css"  charset="utf-8">
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,100,100italic,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="assets/stylesheets/app.css"  charset="utf-8">
+    <link rel="stylesheet" href="pages/map/map.styles.css">
+    <link rel="stylesheet" href="pages/foodApp/foodApp.styles.css">
   </head>
-  <body>
+  <body class="theme-orange layout-orange">
 
     <div class="statusbar-overlay"></div>
     <div class="panel-overlay"></div>
-    <div class="panel panel-left panel-reveal">
+    <!-- <div class="panel panel-left panel-cover">
       <div class="content-block">
-        <!-- <p>Left panel content goes here</p> -->
+        <p>Left panel content goes here</p>
       </div>
-    </div>
+    </div> -->
     <div class="views">
       <div class="view view-main">
         <div class="pages">
@@ -26,28 +30,12 @@
 
     <script type="text/javascript" src="bower_components/Framework7/dist/js/framework7.js"></script>
     <script type="text/javascript" src="bower_components/angular/angular.js"></script>
+    <script type="text/javascript" src="../dist/angular-framework7.js"></script>
 
-    <!-- <script type="text/javascript" src="../src/detectDevice.js"></script>
-    <script type="text/javascript" src="../src/hooks-plugin.js"></script>
-    <script type="text/javascript" src="../src/module.js"></script>
-    <script type="text/javascript" src="../src/hooks.js"></script>
-    <script type="text/javascript" src="../src/framework7.js"></script>
-    <script type="text/javascript" src="../src/compile.js"></script>
-    <script type="text/javascript" src="../src/hash-router.js"></script>
-    <script type="text/javascript" src="../src/router.js"></script>
-
-    <!-- Services -->
-    <!-- <script type="text/javascript" src="../src/services/services.js"></script>
-    <script type="text/javascript" src="../src/services/modals.js"></script> -->
-
-    <!-- Directives -->
-    <!-- <script type="text/javascript" src="../src/directives/directives.js"></script>
-    <script type="text/javascript" src="../src/directives/goBack.js"></script>
-    <script type="text/javascript" src="../src/directives/goTo.js"></script> --> 
-
-    <script type="text/javascript" src="../dist/angular-framework7.js">
-
-    </script>
+    <!-- Angular Google Maps -->
+    <script src='bower_components/lodash/dist/lodash.min.js'></script>
+    <script src='bower_components/angular-simple-logger/dist/angular-simple-logger.min.js'></script>
+    <script src='bower_components/angular-google-maps/dist/angular-google-maps.min.js'></script>
 
     <!-- Home Page  -->
     <script type="text/javascript" src="pages/home/home.module.js"></script>
@@ -56,6 +44,38 @@
     <!-- Modals Page  -->
     <script type="text/javascript" src="pages/modals/modals.module.js"></script>
     <script type="text/javascript" src="pages/modals/modals.controller.js"></script>
+
+    <!-- Popups Page  -->
+    <script type="text/javascript" src="pages/popups/popups.module.js"></script>
+    <script type="text/javascript" src="pages/popups/popups.controller.js"></script>
+
+    <!-- Custom Popup  -->
+    <script type="text/javascript" src="pages/customPopup/customPopup.module.js"></script>
+    <script type="text/javascript" src="pages/customPopup/customPopup.controller.js"></script>
+
+    <!-- Picker Page  -->
+    <script type="text/javascript" src="pages/picker/picker.module.js"></script>
+    <script type="text/javascript" src="pages/picker/picker.controller.js"></script>
+
+    <!-- List Page  -->
+    <script type="text/javascript" src="pages/list/list.module.js"></script>
+    <script type="text/javascript" src="pages/list/list.controller.js"></script>
+
+    <!-- List Page  -->
+    <script type="text/javascript" src="pages/forms/forms.module.js"></script>
+    <script type="text/javascript" src="pages/forms/forms.controller.js"></script>
+
+    <!-- Cards Page  -->
+    <script type="text/javascript" src="pages/cards/cards.module.js"></script>
+    <script type="text/javascript" src="pages/cards/cards.controller.js"></script>
+
+    <!-- Map App Page  -->
+    <script type="text/javascript" src="pages/map/map.module.js"></script>
+    <script type="text/javascript" src="pages/map/map.controller.js"></script>
+
+    <!-- Food App Page  -->
+    <script type="text/javascript" src="pages/foodApp/foodApp.module.js"></script>
+    <script type="text/javascript" src="pages/foodApp/foodApp.controller.js"></script>
 
     <script type="text/javascript" src="app.js"></script>
   </body>

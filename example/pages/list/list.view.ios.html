@@ -1,0 +1,46 @@
+<div class="page product-component cached">
+
+  <div class="navbar cached">
+    <div class="navbar-inner">
+      <div data-panel="left" class="left sliding" go-back>
+        <a href="#" class="link back">
+          <i class="icon icon-back"></i>
+        </a>
+      </div>
+      <div class="center sliding" go-back>Popups</div>
+    </div>
+  </div>
+
+
+  <div class="page-content">
+
+    <div class="list-block media-list">
+      <ul>
+          <li class="swipeout" ng:repeat="item in [0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9] track by $index">
+              <div class="swipeout-content item-content">
+                  <div class="item-media">
+                      <img src="http://lorempixel.com./80/{{item + 80}}">
+                  </div>
+                  <div class="item-inner">
+                      <div class="item-title-row">
+                          <div class="item-title">Element title</div>
+                          <div class="item-after">Element label</div>
+                      </div>
+                      <div class="item-subtitle">Subtitle</div>
+                      <div class="item-text">Additional description text</div>
+                  </div>
+              </div>
+              <div class="swipeout-actions-left">
+                <a href="#" class="action1 bg-pink swipeout-overswipe">Action L1</a>
+                <a href="#" class="action2 bg-lightblue">Action L2</a>
+              </div>
+              <div class="swipeout-actions-right">
+                <a href="#" class="action1 bg-orange">Action R1</a>
+                <a href="#" class="action2 swipeout-overswipe">Action R2</a>
+              </div>
+          </li>
+      </ul>
+  </div>
+  </div>
+
+</div>

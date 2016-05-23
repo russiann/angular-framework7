@@ -1,4 +1,5 @@
 angular.module('framework7', [
+  'framework7.instance',
   'framework7.directives',
   'framework7.services',
 ])

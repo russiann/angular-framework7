@@ -4,7 +4,7 @@ var modalsConfig = function ($F7RouterProvider) {
     name: 'Modals',
     controller: 'ModalsController',
     controllerAs: 'vm',
-    templateUrls: {
+    templateUrl: {
       android: 'pages/modals/modals.view.android.html',
       ios: 'pages/modals/modals.view.ios.html',
     }

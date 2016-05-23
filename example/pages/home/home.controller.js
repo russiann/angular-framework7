@@ -1,5 +1,6 @@
 function HomeController () {
-    this.text = "Angular Framework7 Rocks!"
+    this.text = "Angular Framework7 Rocks!";
+
 }
 
 angular.module('app.home')

@@ -1,8 +1,10 @@
-function goTo ($F7Router) {
+function goTo ($F7Router, $timeout) {
 
   function link (scope, element, attr) {
     element.bind('click', () => {
-      $F7Router.state(attr.goTo);
+      $timeout(function () {
+        $F7Router.state(attr.goTo);
+      })
     })
   }
 

@@ -11,10 +11,7 @@ class F7Router {
       path: path,
       config: config,
       before: function() {
-        const template = self.$F7Provider.theme === 'android' ?
-          this.config.templateUrls.android :
-          this.config.templateUrls.ios;
-
+        const template = this.config.templateUrl[self.$F7Provider.theme]
         console.log('load: ', template);
         self.loadPage(
           template,
@@ -56,7 +53,7 @@ class F7Router {
 
         // é necessário passar a url para que o histórico do f7 funcione normalmente
         // e não haja duplicidade de telas
-        view.router.load({content, url, animatePages:true});
+        view.router.load({content, url});
       });
     }
   }
@@ -64,9 +61,9 @@ class F7Router {
   setLayout(theme, htmlContent) {
 
     var root = htmlContent.parent();
-    var content = htmlContent.find('.page');
-    var navbar = htmlContent.find('.navbar');
-    var toolbar = htmlContent.find('.toolbar');
+    var content = htmlContent.children('.page');
+    var navbar = htmlContent.children('.navbar');
+    var toolbar = htmlContent.children('.toolbar');
 
     if (theme === 'ios') {
       if (navbar.html()) {
@@ -106,11 +103,7 @@ class F7Router {
         return new Promise((resolve, reject) => {
 
           const route = this.routes.find((route) => {
-            if (this.$F7Provider.theme === 'android') {
-              return route.config.templateUrls.android === url
-            } else {
-              return route.config.templateUrls.ios === url
-            }
+            return route.config.templateUrl[this.$F7Provider.theme] === url;
           })
 
           return route ? resolve(route) : reject();

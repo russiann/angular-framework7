@@ -1,0 +1,43 @@
+<div class="page product-component">
+
+  <div class="navbar">
+    <div class="navbar-inner">
+      <div data-panel="left" class="left sliding" go-back>
+        <a href="#" class="link back">
+          <i class="material-icons">arrow_back</i>
+        </a>
+      </div>
+      <div class="center sliding" go-back>Popups</div>
+    </div>
+  </div>
+
+
+  <div class="page-content">
+
+    <div class="content-block">
+      <p>Custom Modal input text model: {{vm.text}}</p>
+      <p><a href="#" class="button button-fill button-big" ng:click="vm.openPicker()">Open Picker</a></p>
+    </div>
+
+
+    <div class="picker-modal" picker-name="about">
+      <!-- Picker Modal Toolbar, optional -->
+      <div class="toolbar">
+        <div class="toolbar-inner">
+          <div class="left"></div>
+          <div class="right">
+            <a href="#" class="link close-picker">Done</a>
+          </div>
+        </div>
+      </div>
+      <!-- Picker Modal Inner -->
+      <div class="picker-modal-inner">
+        <!-- Picker content -->
+        <div class="content-block">
+          <p>Integer mollis nulla id nibh elementum finibus...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

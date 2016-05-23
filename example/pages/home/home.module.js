@@ -4,7 +4,7 @@ var homeConfig = function ($F7RouterProvider) {
     name: 'Home',
     controller: 'HomeController',
     controllerAs: 'vm',
-    templateUrls: {
+    templateUrl: {
       android: 'pages/home/home.view.android.html',
       ios: 'pages/home/home.view.ios.html',
     }

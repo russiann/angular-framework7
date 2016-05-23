@@ -1,0 +1,34 @@
+<div class="page product-component">
+
+  <div class="navbar">
+    <div class="navbar-inner">
+      <div data-panel="left" class="left" go-back>
+        <a href="#" class="link icon-only">
+          <i class="material-icons">arrow_back</i>
+        </a>
+      </div>
+      <div class="center" go-back>Popups</div>
+    </div>
+  </div>
+
+
+  <div class="page-content">
+
+    <div class="content-block">
+      <p>Custom Modal input text model: {{vm.text}}</p>
+      <p><a href="#" class="button button-fill button-big" ng:click="vm.openPopup()">Inner Popup</a></p>
+      <p><a href="#" class="button button-fill button-big" ng:click="vm.openIsolatedPopup()">Isolated Popup</a></p>
+    </div>
+
+
+    <div class="popup" popup-name="about">
+      <div class="content-block">
+        <p>About</p>
+        <p><a href="#" class="close-popup">Close popup</a></p>
+        <p>{{vm.text}}</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>

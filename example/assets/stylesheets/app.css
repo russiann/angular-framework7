@@ -1,0 +1,79 @@
+body, html {
+  font-family: 'Lato', sans-serif!important;
+}
+.no-animation {
+  animation: none!important;
+}
+
+
+.modal.modal-in .modal-inner, .modal.modal-in .modal-buttons {
+  -webkit-backdrop-filter: blur(18px) contrast(5);
+  background-color: rgba(255,255,255,0.85)!important;
+}
+
+.modal.modal-in .modal-button {
+  background: none;
+}
+
+.modal-overlay {
+  background: rgba(0,0,0,.1)!important;
+}
+
+
+.ios .navbar {
+  -webkit-backdrop-filter: blur(18px) contrast(1);
+  background-color: rgba(255,255,255,0.85)!important;
+}
+
+.facebook-card .card-header {
+  display: block;
+  padding: 10px;
+}
+.facebook-card .facebook-avatar {
+  float: left;
+}
+.facebook-card .facebook-name {
+  margin-left: 44px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.facebook-card .facebook-date {
+  margin-left: 44px;
+  font-size: 13px;
+  color: #8e8e93;
+}
+.facebook-card .card-footer {
+  background: #fafafa;
+}
+.facebook-card .card-footer a {
+  color: #81848b;
+  font-weight: 500;
+}
+.facebook-card .card-content img {
+  display: block;
+}
+.facebook-card .card-content-inner {
+  padding: 15px 10px;
+}
+.theme-orange .material-icons {
+
+}
+.android .navbar {
+  box-shadow: 0px 0px 3px 2px rgba(0,0,0,.1);
+}
+
+.android .center {
+  color: white!important
+}
+
+.android .list-block {
+  background: #fff!important;
+}
+
+.android .page-content {
+  background-color: #FAFAFA!important;
+}
+
+.android .card-footer a.link, .android .card-header a.link {
+  color: orange;
+}

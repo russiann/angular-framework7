@@ -58,5 +58,5 @@ class Framework7 {
 
 }
 
-angular.module('framework7')
+angular.module('framework7.instance', [])
   .provider('$F7', Framework7)

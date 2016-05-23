@@ -18,6 +18,7 @@
   "dependencies": {
     "Framework7": "framework7#~1.4.2",
     "angular": "~1.5.5",
-    "material-design-icons": "~2.2.3"
+    "material-design-icons": "~2.2.3",
+    "ramjet": "~0.5.0"
   }
 }

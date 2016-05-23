@@ -56,7 +56,7 @@ window.Framework7.prototype.plugins.hooks = function (app, params) {
 ;(function() {
 'use strict';
 
-angular.module('framework7', ['framework7.directives', 'framework7.services']).run(function ($F7Compile, $F7Hooks, HashRouter) {
+angular.module('framework7', ['framework7.instance', 'framework7.directives', 'framework7.services']).run(function ($F7Compile, $F7Hooks, HashRouter) {
   $F7Hooks.init();
   $F7Compile.init();
   HashRouter.init();
@@ -117,9 +117,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ngFramework7 = function () {
-  function ngFramework7() {
-    _classCallCheck(this, ngFramework7);
+var Framework7 = function () {
+  function Framework7() {
+    _classCallCheck(this, Framework7);
 
     this.instance = null;
     this.views = [];
@@ -127,7 +127,7 @@ var ngFramework7 = function () {
     this.theme = null;
   }
 
-  _createClass(ngFramework7, [{
+  _createClass(Framework7, [{
     key: "init",
     value: function init(params, debug) {
       this.theme = window.Framework7.prototype.device.android ? "android" : "ios";
@@ -192,10 +192,10 @@ var ngFramework7 = function () {
     }
   }]);
 
-  return ngFramework7;
+  return Framework7;
 }();
 
-angular.module('framework7').provider('$F7', ngFramework7);
+angular.module('framework7.instance', []).provider('$F7', Framework7);
 }());
 
 ;(function() {
@@ -487,8 +487,7 @@ var F7Router = function () {
         path: path,
         config: config,
         before: function before() {
-          var template = self.$F7Provider.theme === 'android' ? this.config.templateUrls.android : this.config.templateUrls.ios;
-
+          var template = this.config.templateUrl[self.$F7Provider.theme];
           console.log('load: ', template);
           self.loadPage(template, this.config.name, this.config.controller, this.config.controllerAs, this.config.hooks);
           this.task.done();
@@ -527,7 +526,7 @@ var F7Router = function () {
 
           // é necessário passar a url para que o histórico do f7 funcione normalmente
           // e não haja duplicidade de telas
-          view.router.load({ content: content, url: url, animatePages: true });
+          view.router.load({ content: content, url: url });
         });
       }
     }
@@ -536,9 +535,9 @@ var F7Router = function () {
     value: function setLayout(theme, htmlContent) {
 
       var root = htmlContent.parent();
-      var content = htmlContent.find('.page');
-      var navbar = htmlContent.find('.navbar');
-      var toolbar = htmlContent.find('.toolbar');
+      var content = htmlContent.children('.page');
+      var navbar = htmlContent.children('.navbar');
+      var toolbar = htmlContent.children('.toolbar');
 
       if (theme === 'ios') {
         if (navbar.html()) {
@@ -581,11 +580,7 @@ var F7Router = function () {
           return new Promise(function (resolve, reject) {
 
             var route = _this2.routes.find(function (route) {
-              if (_this2.$F7Provider.theme === 'android') {
-                return route.config.templateUrls.android === url;
-              } else {
-                return route.config.templateUrls.ios === url;
-              }
+              return route.config.templateUrl[_this2.$F7Provider.theme] === url;
             });
 
             return route ? resolve(route) : reject();
@@ -622,7 +617,7 @@ angular.module('framework7').provider('$F7Router', F7Router);
 ;(function() {
 'use strict';
 
-angular.module('framework7.services', ['framework7.services.modals']);
+angular.module('framework7.services', ['framework7.services.modals', 'framework7.services.popups', 'framework7.services.progressbar', 'framework7.services.picker']);
 }());
 
 ;(function() {
@@ -720,6 +715,237 @@ angular.module('framework7.services.modals', []).service('$F7Modal', F7Modal);
 ;(function() {
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var F7Popup = function () {
+  function F7Popup($F7Provider) {
+    _classCallCheck(this, F7Popup);
+
+    this.$F7Provider = $F7Provider;
+    this.popups = {};
+  }
+
+  _createClass(F7Popup, [{
+    key: 'add',
+    value: function add(parameters) {
+      this.popups[parameters.name] = parameters;
+    }
+  }, {
+    key: '$get',
+    value: function $get($F7, $F7Compile, $rootScope, $controller) {
+      var _this = this;
+
+      var instance = $F7.instance();
+      var setHooks = function setHooks(popup, hooks, $scope) {
+        popup.on('open', function () {
+          if (hooks && hooks.open) {
+            hooks.open(popup);
+          }
+        });
+
+        popup.on('opened', function () {
+          if (hooks && hooks.opened) {
+            hooks.opened(popup);
+          }
+        });
+
+        popup.on('close', function () {
+          if (hooks && hooks.close) {
+            hooks.close(popup);
+          }
+        });
+
+        popup.on('closed', function () {
+          if (hooks && hooks.closed) {
+            hooks.closed(popup);
+          }
+          if ($scope) $scope.$destroy();
+          popup.remove();
+        });
+      };
+      return {
+        new: function _new(parameters) {
+          if (!parameters.name) {
+            throw Error('Popup name is required!');
+          }
+          var element = Dom7('.page-on-center .popup[popup-name="' + parameters.name + '"]');
+          var id = 'id-' + Date.now();
+          var newElement = angular.copy(element);
+          newElement.addClass(id);
+          Dom7('body').append(newElement);
+
+          var popup = Dom7('.' + id);
+
+          if (parameters.scope) {
+            $F7Compile.element(popup, parameters.scope);
+          }
+
+          setHooks(popup, parameters.hooks);
+
+          instance.popup('.' + id);
+        },
+
+        open: function open(name) {
+          var popup = _this.popups[name];
+          if (!popup) throw Error(name + ' Popup doesn\'t exist!');
+
+          Dom7.get(popup.templateUrl[_this.$F7Provider.theme], function (data) {
+            var element = Dom7(data);
+            var id = 'id-' + Date.now();
+            element.addClass(id);
+            Dom7('body').append(element);
+            var _popup = Dom7('.' + id);
+
+            var $scope = $rootScope.$new();
+            $controller(popup.controller, { $scope: $scope }, null, popup.controllerAs);
+
+            setHooks(_popup, popup.hooks, $scope);
+
+            $F7Compile.element(_popup, $scope);
+
+            instance.popup('.' + id);
+          });
+        }
+      };
+    }
+  }]);
+
+  return F7Popup;
+}();
+
+angular.module('framework7.services.popups', []).provider('$F7Popup', F7Popup);
+}());
+
+;(function() {
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var F7ProgressBar = function () {
+  function F7ProgressBar($F7, $F7Compile, $rootScope) {
+    _classCallCheck(this, F7ProgressBar);
+
+    this.instance = $F7.instance();
+    this.$F7Compile = $F7Compile;
+    this.$rootScope = $rootScope;
+  }
+
+  _createClass(F7ProgressBar, [{
+    key: 'show',
+    value: function show(container, progress, color) {
+      this.instance.showProgressbar(container, progress, color);
+    }
+  }, {
+    key: 'showTop',
+    value: function showTop(progress, color) {
+      this.instance.showProgressbar(Dom7('body'), progress, color);
+    }
+  }, {
+    key: 'hide',
+    value: function hide(container) {
+      this.instance.hideProgressbar(container);
+    }
+  }, {
+    key: 'set',
+    value: function set(container, progress, speed) {
+      this.instance.setProgressbar(container, progress, speed);
+    }
+  }]);
+
+  return F7ProgressBar;
+}();
+
+angular.module('framework7.services.progressbar', []).service('$F7ProgressBar', F7ProgressBar);
+}());
+
+;(function() {
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var F7Picker = function () {
+  function F7Picker($F7, $F7Compile, $rootScope) {
+    _classCallCheck(this, F7Picker);
+
+    this.instance = $F7.instance();
+    this.$F7Compile = $F7Compile;
+    this.$rootScope = $rootScope;
+  }
+
+  _createClass(F7Picker, [{
+    key: 'setHooks',
+    value: function setHooks(popup, hooks, $scope, callback) {
+      popup.on('open', function () {
+        if (hooks && hooks.open) {
+          hooks.open(popup);
+        }
+      });
+
+      popup.on('opened', function () {
+        if (hooks && hooks.opened) {
+          hooks.opened(popup);
+        }
+      });
+
+      popup.on('close', function () {
+        if (hooks && hooks.close) {
+          hooks.close(popup);
+        }
+      });
+
+      popup.on('closed', function () {
+        if (hooks && hooks.closed) {
+          hooks.closed(popup);
+        }
+        // if ($scope) $scope.$destroy();
+        popup.remove();
+        callback();
+      });
+    }
+  }, {
+    key: 'open',
+    value: function open(parameters) {
+      var _this = this;
+
+      if (!parameters.name) throw Error('Picker name is required!');
+      if (Dom7('.picker-modal.modal-in').length > 0) return;
+      var element = Dom7('.page-on-center .picker-modal[picker-name="' + parameters.name + '"]');
+      var id = 'id-' + Date.now();
+      var newElement = angular.copy(element);
+      newElement.addClass(id);
+      Dom7('body').append(newElement);
+
+      var popup = Dom7('.' + id);
+
+      if (parameters.scope) {
+        this.$F7Compile.element(popup, parameters.scope);
+      }
+
+      return new Promise(function (resolve) {
+        _this.setHooks(popup, parameters.hooks, parameters.scope, function () {
+          resolve();
+        });
+
+        _this.instance.pickerModal('.' + id);
+      });
+    }
+  }]);
+
+  return F7Picker;
+}();
+
+angular.module('framework7.services.picker', []).service('$F7Picker', F7Picker);
+}());
+
+;(function() {
+'use strict';
+
 angular.module('framework7.directives', ['framework7.directive.goBack', 'framework7.directive.goTo']);
 }());
 
@@ -746,11 +972,13 @@ angular.module('framework7.directive.goBack', []).directive('goBack', goBack);
 ;(function() {
 'use strict';
 
-function goTo($F7Router) {
+function goTo($F7Router, $timeout) {
 
   function link(scope, element, attr) {
     element.bind('click', function () {
-      $F7Router.state(attr.goTo);
+      $timeout(function () {
+        $F7Router.state(attr.goTo);
+      });
     });
   }
 
