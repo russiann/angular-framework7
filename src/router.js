@@ -1,25 +1,35 @@
 class F7Router {
-  constructor(HashRouterProvider, $F7Provider) {
+  constructor(HashRouterProvider, $F7Provider, $F7PopupProvider) {
     this.$F7Provider = $F7Provider;
-    this.HashRouter = HashRouterProvider;
+    this.$F7PopupProvider    = $F7PopupProvider;
+    this.HashRouter  = HashRouterProvider;
     this.routes = [];
   }
 
   when(path, config) {
     const self = this;
+    if (config.type === 'popup') {
+      this.$F7PopupProvider.add(config);
+    }
     const route = {
       path: path,
       config: config,
       before: function() {
-        const template = this.config.templateUrl[self.$F7Provider.theme]
-        console.log('load: ', template);
-        self.loadPage(
-          template,
-          this.config.name,
-          this.config.controller,
-          this.config.controllerAs,
-          this.config.hooks
-        );
+        if (this.config.type === 'popup') {
+          Dom7(window).trigger('popupPage:open', this.config.name);
+          // self.$F7PopupProvider.open(this.config.name);
+        } else {
+          const template = this.config.templateUrl[self.$F7Provider.theme];
+          console.log('load: ', template);
+          self.loadPage(
+            template,
+            this.config.name,
+            this.config.controller,
+            this.config.controllerAs,
+            this.config.hooks,
+            this.config.view
+          );
+        }
         this.task.done();
       },
       on: function() {
@@ -34,9 +44,13 @@ class F7Router {
     return this;
   }
 
-  loadPage(url, pageName, controller, controllerAs, hooks) {
+  loadPage(url, pageName, controller, controllerAs, hooks, view) {
+    // 1. Verificar se é uma ação de Voltar
+    // 2. Se for um 'Voltar'
+    // 2.1 Se houver dois itens no historico da view atual
     const theme = this.$F7Provider.theme;
-    const view = this.$F7Provider.getMainView();
+    const instance = this.$F7Provider.instance;
+    var view = instance.getCurrentView();
     if (~view.history.indexOf(url)) {
       view.router.back({ force: 'true', url: url });
     } else {
@@ -47,7 +61,7 @@ class F7Router {
         var ngController = controller;
         if (controllerAs) ngController += ' as ' + controllerAs;
 
-        content.find('.page').attr('data-page', pageName);
+        content.attr('data-page', pageName);
 
         content = this.setLayout(theme, content);
 
@@ -99,12 +113,18 @@ class F7Router {
           throw new Error('Route doesn\'t exist!')
         }
       },
-      findRouteByUrl: (url) => {
+      findRouteByUrl: (url, name) => {
         return new Promise((resolve, reject) => {
 
-          const route = this.routes.find((route) => {
+          var route = this.routes.find((route) => {
             return route.config.templateUrl[this.$F7Provider.theme] === url;
           })
+
+          if (!route) {
+            route = this.routes.find((route) => {
+              return route.config.name === name;
+            })
+          }
 
           return route ? resolve(route) : reject();
         })

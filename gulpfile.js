@@ -3,7 +3,7 @@ const concat = require('gulp-concat');
 const babel  = require('gulp-babel');
 const iife   = require('gulp-iife');
 
-gulp.task('scripts', () => {
+gulp.task('default', () => {
   return gulp.src([
     './src/detectDevice.js',
     './src/hooks-plugin.js',

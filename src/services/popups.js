@@ -10,7 +10,7 @@ class F7Popup {
 
   $get($F7, $F7Compile, $rootScope, $controller) {
     const instance = $F7.instance();
-    const setHooks = (popup, hooks, $scope) => {
+    const setHooks = (popup, hooks, $scope, options) => {
       popup.on('open', () => {
         if (hooks && hooks.open) {
           hooks.open(popup);
@@ -35,9 +35,18 @@ class F7Popup {
         }
         if ($scope) $scope.$destroy();
         popup.remove();
+        options.opened = false;
+        window.history.back();
+        if (options.view.viewClass) {
+          $F7.removeView(options.view.viewClass, options.view.viewName);
+        }
       });
     }
-    return {
+    Dom7(window).on('popupPage:open', (ev) => {
+      console.log(ev.detail);
+      factory.open(ev.detail || ev.details);
+    });
+    const factory = {
       new: (parameters) => {
         if (!parameters.name) {
           throw Error('Popup name is required!');
@@ -54,15 +63,23 @@ class F7Popup {
           $F7Compile.element(popup, (parameters.scope));
         }
 
-        setHooks(popup, parameters.hooks)
+        setHooks(popup, parameters.hooks, null, parameters.view);
 
         instance.popup(`.${id}`);
+
+        if (parameters.view) {
+          if (parameters.view.viewName) throw Error('Popup view require viewName!');
+          if (parameters.view.viewClass) throw Error('Popup view require viewClass!');
+        }
 
       },
 
       open: (name) => {
         const popup = this.popups[name];
         if (!popup) throw Error(`${name} Popup doesn't exist!`);
+        if (popup.opened) {
+          return popup._view.router.back();
+        }
 
         Dom7.get(popup.templateUrl[this.$F7Provider.theme], (data) => {
           const element = Dom7(data);
@@ -74,14 +91,28 @@ class F7Popup {
           const $scope = $rootScope.$new();
           $controller(popup.controller, {$scope}, null, popup.controllerAs);
 
-          setHooks(_popup, popup.hooks, $scope)
+          setHooks(_popup, popup.hooks, $scope, popup);
 
           $F7Compile.element(_popup, $scope);
 
           instance.popup(`.${id}`);
+          popup.opened = true;
+
+          // TODO: Init View only after popup 'opened' event,
+          //       and delete view after 'closed' evend
+          popup._view = this.$F7Provider.addView(
+            popup.view.viewName,
+            popup.view.viewClass,
+            popup.view.options
+          );
         })
+      },
+      close: (popup) => {
+        instance.closeModal(popup);
       }
     }
+
+    return factory;
 
   }
 

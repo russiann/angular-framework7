@@ -1,12 +1,27 @@
 ;(function() {
 'use strict';
 
-if (Framework7.prototype.device.android) {
-  Dom7('head').append('<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.min.css">' + '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.colors.min.css">');
-} else {
-  Dom7('.view').append('<div class="navbar"></div>');
-  Dom7('head').append('<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.min.css">' + '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.colors.min.css">');
-}
+(function () {
+  var device = Dom7('html').attr('platform');
+
+  if (device === 'android') return setAndroidTheme();
+  if (device === 'ios') return setIosTheme();
+
+  Framework7.prototype.device.android ? setAndroidTheme() : setIosTheme();
+
+  function setIosTheme() {
+    window.selectedPlatform = 'ios';
+    Dom7('.view').append('<div class="navbar"></div>');
+    Dom7('head').append('<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.min.css">' + '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.colors.min.css">');
+    Dom7('html').addClass('platform-ios');
+  }
+
+  function setAndroidTheme() {
+    window.selectedPlatform = 'android';
+    Dom7('head').append('<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.min.css">' + '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.colors.min.css">');
+    Dom7('html').addClass('platform-android');
+  }
+})();
 }());
 
 ;(function() {
@@ -122,7 +137,7 @@ var Framework7 = function () {
     _classCallCheck(this, Framework7);
 
     this.instance = null;
-    this.views = [];
+    this.views = {};
     this.mainView = null;
     this.theme = null;
   }
@@ -130,7 +145,13 @@ var Framework7 = function () {
   _createClass(Framework7, [{
     key: "init",
     value: function init(params, debug) {
-      this.theme = window.Framework7.prototype.device.android ? "android" : "ios";
+
+      if (window.selectedPlatform) {
+        this.theme = window.selectedPlatform;
+      } else {
+        this.theme = window.Framework7.prototype.device.android ? "android" : "ios";
+      }
+
       if (this.theme === 'android') {
         params.material = true;
         Dom7('.pages').addClass('navbar-fixed');
@@ -145,6 +166,7 @@ var Framework7 = function () {
   }, {
     key: "addView",
     value: function addView(name, selector, parameters, isMainView) {
+      parameters = parameters || {};
       if (this.f7) throw Error('Framework7 not initialized.');
       if (this.views[name]) {
         throw Error("View with name " + name + " already defined!");
@@ -155,6 +177,7 @@ var Framework7 = function () {
       var view = this.instance.addView(selector, parameters);
       this.views[name] = view;
       if (isMainView) this.mainView = view;
+      return view;
     }
   }, {
     key: "getInstance",
@@ -177,6 +200,17 @@ var Framework7 = function () {
         },
         mainView: function mainView() {
           return _this.getMainView;
+        },
+        views: function views() {
+          return _this.views;
+        },
+        removeView: function removeView(viewClass, viewName) {
+          var viewindex = _this.instance.views.findIndex(function (v) {
+            return v.selector === viewClass;
+          });
+          _this.instance.views[viewindex].destroy();
+          _this.instance.views.splice(viewindex, 1);
+          delete _this.views[viewName];
         },
         theme: function theme() {
           return _this.theme;
@@ -273,7 +307,7 @@ function HashRouter() {
           _this.init();
           $rootScope.$on('f7:pageAfterAnimation', function (e, data) {
             if (data.detail.pageData.swipeBack) {
-              $F7Router.findRouteByUrl(data.detail.pageData.url).then(function (route) {
+              $F7Router.findRouteByUrl(data.detail.pageData.url, data.detail.pageData.name).then(function (route) {
                 Router.navigate(route.path);
               });
             }
@@ -471,10 +505,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var F7Router = function () {
-  function F7Router(HashRouterProvider, $F7Provider) {
+  function F7Router(HashRouterProvider, $F7Provider, $F7PopupProvider) {
     _classCallCheck(this, F7Router);
 
     this.$F7Provider = $F7Provider;
+    this.$F7PopupProvider = $F7PopupProvider;
     this.HashRouter = HashRouterProvider;
     this.routes = [];
   }
@@ -483,13 +518,21 @@ var F7Router = function () {
     key: 'when',
     value: function when(path, config) {
       var self = this;
+      if (config.type === 'popup') {
+        this.$F7PopupProvider.add(config);
+      }
       var route = {
         path: path,
         config: config,
         before: function before() {
-          var template = this.config.templateUrl[self.$F7Provider.theme];
-          console.log('load: ', template);
-          self.loadPage(template, this.config.name, this.config.controller, this.config.controllerAs, this.config.hooks);
+          if (this.config.type === 'popup') {
+            Dom7(window).trigger('popupPage:open', this.config.name);
+            // self.$F7PopupProvider.open(this.config.name);
+          } else {
+              var template = this.config.templateUrl[self.$F7Provider.theme];
+              console.log('load: ', template);
+              self.loadPage(template, this.config.name, this.config.controller, this.config.controllerAs, this.config.hooks, this.config.view);
+            }
           this.task.done();
         },
         on: function on() {
@@ -505,11 +548,15 @@ var F7Router = function () {
     }
   }, {
     key: 'loadPage',
-    value: function loadPage(url, pageName, controller, controllerAs, hooks) {
+    value: function loadPage(url, pageName, controller, controllerAs, hooks, view) {
       var _this = this;
 
+      // 1. Verificar se é uma ação de Voltar
+      // 2. Se for um 'Voltar'
+      // 2.1 Se houver dois itens no historico da view atual
       var theme = this.$F7Provider.theme;
-      var view = this.$F7Provider.getMainView();
+      var instance = this.$F7Provider.instance;
+      var view = instance.getCurrentView();
       if (~view.history.indexOf(url)) {
         view.router.back({ force: 'true', url: url });
       } else {
@@ -520,7 +567,7 @@ var F7Router = function () {
           var ngController = controller;
           if (controllerAs) ngController += ' as ' + controllerAs;
 
-          content.find('.page').attr('data-page', pageName);
+          content.attr('data-page', pageName);
 
           content = _this.setLayout(theme, content);
 
@@ -576,12 +623,18 @@ var F7Router = function () {
             throw new Error('Route doesn\'t exist!');
           }
         },
-        findRouteByUrl: function findRouteByUrl(url) {
+        findRouteByUrl: function findRouteByUrl(url, name) {
           return new Promise(function (resolve, reject) {
 
             var route = _this2.routes.find(function (route) {
               return route.config.templateUrl[_this2.$F7Provider.theme] === url;
             });
+
+            if (!route) {
+              route = _this2.routes.find(function (route) {
+                return route.config.name === name;
+              });
+            }
 
             return route ? resolve(route) : reject();
           });
@@ -738,7 +791,7 @@ var F7Popup = function () {
       var _this = this;
 
       var instance = $F7.instance();
-      var setHooks = function setHooks(popup, hooks, $scope) {
+      var setHooks = function setHooks(popup, hooks, $scope, options) {
         popup.on('open', function () {
           if (hooks && hooks.open) {
             hooks.open(popup);
@@ -763,9 +816,18 @@ var F7Popup = function () {
           }
           if ($scope) $scope.$destroy();
           popup.remove();
+          options.opened = false;
+          window.history.back();
+          if (options.view.viewClass) {
+            $F7.removeView(options.view.viewClass, options.view.viewName);
+          }
         });
       };
-      return {
+      Dom7(window).on('popupPage:open', function (ev) {
+        console.log(ev.detail);
+        factory.open(ev.detail || ev.details);
+      });
+      var factory = {
         new: function _new(parameters) {
           if (!parameters.name) {
             throw Error('Popup name is required!');
@@ -782,14 +844,22 @@ var F7Popup = function () {
             $F7Compile.element(popup, parameters.scope);
           }
 
-          setHooks(popup, parameters.hooks);
+          setHooks(popup, parameters.hooks, null, parameters.view);
 
           instance.popup('.' + id);
+
+          if (parameters.view) {
+            if (parameters.view.viewName) throw Error('Popup view require viewName!');
+            if (parameters.view.viewClass) throw Error('Popup view require viewClass!');
+          }
         },
 
         open: function open(name) {
           var popup = _this.popups[name];
           if (!popup) throw Error(name + ' Popup doesn\'t exist!');
+          if (popup.opened) {
+            return popup._view.router.back();
+          }
 
           Dom7.get(popup.templateUrl[_this.$F7Provider.theme], function (data) {
             var element = Dom7(data);
@@ -801,14 +871,24 @@ var F7Popup = function () {
             var $scope = $rootScope.$new();
             $controller(popup.controller, { $scope: $scope }, null, popup.controllerAs);
 
-            setHooks(_popup, popup.hooks, $scope);
+            setHooks(_popup, popup.hooks, $scope, popup);
 
             $F7Compile.element(_popup, $scope);
 
             instance.popup('.' + id);
+            popup.opened = true;
+
+            // TODO: Init View only after popup 'opened' event,
+            //       and delete view after 'closed' evend
+            popup._view = _this.$F7Provider.addView(popup.view.viewName, popup.view.viewClass, popup.view.options);
           });
+        },
+        close: function close(popup) {
+          instance.closeModal(popup);
         }
       };
+
+      return factory;
     }
   }]);
 

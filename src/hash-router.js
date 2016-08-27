@@ -7,7 +7,7 @@ function HashRouter () {
           this.init();
           $rootScope.$on('f7:pageAfterAnimation', (e, data) => {
             if (data.detail.pageData.swipeBack) {
-              $F7Router.findRouteByUrl(data.detail.pageData.url)
+              $F7Router.findRouteByUrl(data.detail.pageData.url, data.detail.pageData.name)
               .then((route) => {
                 Router.navigate(route.path);
               })
